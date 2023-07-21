@@ -1,0 +1,18 @@
+galaxy_info:
+  role_name:    disk
+  author:       lunics
+  description:  A role to manage disk partitions
+  license:      GPL-3.0
+  company:      none
+  min_ansible_version: 2.1
+  platforms:
+    - name: Archlinux
+      versions:
+        - all
+  galaxy_tags:
+    - parted
+    - luks
+    - lvm
+    - btrfs
+
+dependencies: []
