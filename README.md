@@ -1,29 +1,65 @@
-# Ansible role: CRON
+# Ansible role: DISK
 
-Install and deploy cron jobs and cron vars.
-
-A copy of [robertdebock/ansible-role-cron](https://github.com/robertdebock/ansible-role-cron).
+Manage disk partitions at every level:
+- gpt
+- luks
+- lvm
+- btrfs
 
 Only available on Archlinux.
 
 ## Usage
+see [default]()
 ```yaml
-cron_jobs: []
-  - name:       description of the task
-    day:        1-15          # for the first part of the month
-    hour:       23            # in the 23rd hour
-    job:        ls -l         # run this command
-    minute:     "*/10"        # every 10 minutes
-    user:       root          # for a specific user
-    cron_file:
-    month:
-    weekday:
-    special_time:
-    state:
+gpt:
+  - device: /dev/nvme0n1
+    partition:
+     - number: 1
+       start:  0%
+       end:    300MiB
+       flags:  esp
+     - number: 2
+       start:  300MiB
+       end:    100%
 
-cron_vars: []
-  - name:   PATH
-    value:  /usr/bin:/bin:/usr/local/bin
-    user:   root
+luks:
+  - partition: /dev/nvme0n1p2
+    name:      luks
+    password:  "{{ vault.luks }}"
 
+lvm:
+  - vgname: lvm
+    disks:
+      - /dev/mapper/luks
+    volumes:
+      - lvname:     swap
+        size:       16g
+      - lvname:     btrfs
+        size:       100%FREE
+
+fs:
+  - fstype: vfat            # UEFI System Partition (ESP) must be in FAT variant vfat/FAT32
+    dev:    /dev/nvme0n1p1
+    force:  true
+    label:  boot
+    mount:
+      point: /boot
+  - fstype: swap
+    dev:    /dev/lvm/swap
+    label:  swap
+  - fstype: btrfs
+    dev:    /dev/lvm/btrfs
+    opts:   --nodiscard --checksum xxhash
+    label:  btrfs
+    mount:
+      point: /
+
+btrfs:
+  - @
+  - @var
+  - @var_log
+  - @usr
+  - @opt
+  - @snapshots
+  - @home
 ```
