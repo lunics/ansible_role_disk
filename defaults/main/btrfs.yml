@@ -1,0 +1,1 @@
+btrfs_options: "defaults,noatime,nodiratime,ssd,discard,compress=zstd:3,commit=120"

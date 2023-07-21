@@ -1,0 +1,21 @@
+- block:
+  - name: mount | set_fact > chroot path
+    set_fact:
+      t_chroot: "{{ path_chroot if ansible_play_name == 'bootstrap' else '' }}"
+
+  - name: mount | file > create root dir first
+    file:
+      path:  "{{ t_chroot }}/"
+      state: directory
+
+  - name: mount > partition.s, volume.s and subvolume.s
+    mount:
+      src:    "{{ item.dev         }}"
+      path:   "{{ t_chroot + item.mount.point }}"
+      fstype: "{{ item.fstype      }}"
+      opts:   "{{ item.mount.opts  | default(omit)      }}"
+      state:  "{{ item.mount.state | default('mounted') }}"
+    with_items:
+      - "{{ fs }}"
+
+  tags: mount

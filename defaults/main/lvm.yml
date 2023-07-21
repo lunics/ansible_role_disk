@@ -1,0 +1,8 @@
+lvm: []
+  # - vgname: lvm
+  #   state:  present
+  #   disks:
+  #     - /dev/nvme0n1p2
+  #   volumes:
+  #     - lvname:     root
+  #       size:       100%FREE

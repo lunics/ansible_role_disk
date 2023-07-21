@@ -1,0 +1,18 @@
+fs: []
+  # - fstype: ext4
+  #   dev:    /dev/lvm/root
+  #   label:  root
+  #   mount:
+  #     point: /
+  # # - fstype: btrfs
+  # #   dev:    /dev/lvm/btrfs
+  # #   label:  root
+  # #   mount:
+  # #     point: /
+  # - fstype: vfat
+  #   dev:    /dev/vda1
+  #   force:  true
+  #   mount:
+  #     point: /boot
+  # # - fstype: swap
+  # #   dev:    /dev/vda3         # doit être placée en 3ème postition

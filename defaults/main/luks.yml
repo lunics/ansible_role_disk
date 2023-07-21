@@ -1,0 +1,13 @@
+luks: []
+  # - partition: /dev/nvme0n1p2
+  #   name:      luks
+  #   password:  "{{ vault.luks }}"
+
+  #   cipher:     aes-xts-plain64
+  #   type:       luks2
+  #   hash:       sha512
+  #   label:      luks
+  #   pbkdf:
+  #     iteration_time: 5
+  #   keyfile:    "/vault/keyfile"
+  #   state:      opened

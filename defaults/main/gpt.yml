@@ -1,0 +1,11 @@
+gpt: []
+  # - device: /dev/nvme0n1
+  #   partition:
+  #    - number: 1
+  #      start:  0%
+  #      end:    300MiB
+  #      flags:  esp
+  #    - number: 2
+  #      start:  300MiB
+  #      end:    100%
+  #      flags:  btrfs

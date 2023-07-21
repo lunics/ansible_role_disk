@@ -1,0 +1,11 @@
+luks_enable:  false
+lvm_enable:   false
+ext4_enable:  false
+btrfs_enable: false
+swap_enable:  false
+
+default_luks_name: luks
+default_vg_name:   lvm
+default_swapiness: 10
+
+chroot: /mnt

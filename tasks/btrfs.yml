@@ -1,0 +1,127 @@
+- block:
+  - name: btrfs | mount > lvm-btrfs partition on "{{ chroot }}"
+    mount:
+      path:   "{{ chroot }}"
+      src:    "{{ item.dev }}"
+      fstype: "{{ item.fstype }}"
+      opts:   "{{ btrfs_options }}"
+      state:  mounted
+    with_items: "{{ fs }}"
+    when:
+      - item.mount.point == "/"
+      - item.fstype == "btrfs"
+
+  - name: btrfs | btrfs_subvolumes create btrfs subvolumes
+    btrfs_subvolume:
+      path:  "{{ chroot + '/' + item }}"
+      state: present
+    with_item: "{{ btrfs }}"
+
+  - name: btrfs | file > disable copy-on-write on "{{ chroot }}"/@var
+    file:
+      path: "{{ chroot }}/@var"
+      attributes: +C
+
+  - name: btrfs | mount > unmout lvm-btrfs partition and mount btrfs subvol=@
+    mount:
+      path:   "{{ item.path   }}"
+      src:    "{{ item.src    | default(omit) }}"
+      fstype: "{{ item.fstype | default(omit) }}"
+      opts:   "{{ item.opts   | default(omit) }}"
+      state:  "{{ item.state  }}"
+    loop:
+      - { path: "{{ chroot }}",
+          state: absent }
+      - { path: "{{ chroot }}",
+          src: "{{ _vg_path }}/btrfs",
+          opts: "{{ btrfs_options }},subvol=@",
+          fstype: btrfs,
+          state: mounted }
+
+  - name: btrfs | file > mkdir "{{ chroot }}/{usr,var,opt,.snapshots,,home,boot}"
+    file:
+      path:  "{{ chroot }}/{{ item.path }}"
+      state: "{{ item.state | default('directory') }}"
+    loop:
+      # a delete ? - { path: "{{ _ls.stdout_lines }}", state: absent }  # ?delete files on {{ chroot }}"?
+      - { path: usr                 }
+      - { path: var/log             }
+      - { path: opt                 }
+      # - { path: "@var/cache/pacman" }
+      - { path: snapshots           }
+      - { path: home                }
+      - { path: boot                }
+
+  # - name: "[btrfs_subvolumes] create @var/cache/pacman/pkg btrfs subvolumes"
+  #   btrfs_subvolume:
+  #     state:    present
+  #     path:     "{{ chroot }}/@var/cache/pacman/pkg"
+
+  ## if /tmp on a separate partition: chmod 1777 /mnt/tmp
+  ## if /var/tmp on a separate partition: chmod 1777 /mnt/var/tmp
+  ### v1
+  # - name: "[mount] btrfs subvolumes {{ chroot }}/{var,var/log,usr,opt,home}"
+  #   loop:
+  #     # - { dir: var,  src: "/dev/{{ disk.vg | default('lvm') }}/var",  fs: "{{ _sys_fs }}" }
+  #     # - { dir: usr,  src: "/dev/{{ disk.vg | default('lvm') }}/usr",  fs: "{{ _sys_fs }}" }
+  #     # - { dir: home, src: "/dev/{{ disk.vg | default('lvm') }}/home", fs: "{{ _sys_fs }}" }
+  #     - { dir: boot, src: "{{ _boot_partition }}", fs: vfat }
+  #   mount:
+  #     path:   "{{ chroot }}/{{ item.dir }}"
+  #     src:    "{{ item.src }}"
+  #     fstype: "{{ item.fs }}"
+  #     state:  mounted
+
+  ## SI on veut var/log et var/cache/pacman/pkg dans des subvolumes btrfs isolé ALORS
+    ## MONTER /var > mkdir var/log et /var/cache/pacman/pkg > mount @var/log et @var/cache/pacman/pkg
+
+  ### v2
+  # todo: https://wiki.gentoo.org/wiki/Security_Handbook/Mounting_partitions
+  - name: btrfs | mount > btrfs subvolumes "{{ chroot }}/{var,usr,opt,home}"
+    mount:
+      path:   "{{ item.path  }}"
+      src:    "{{ item.src   | default(omit)      }}"
+      fstype: "{{ item.fs    | default('btrfs')   }}"
+      opts:   "{{ item.opts  | default(omit)      }}"
+      state:  "{{ item.state | default('mounted') }}"
+    loop:
+      # - { path: "{{ chroot }}/",        state: absent }
+      - { path: "{{ chroot }}/var",       src: "{{ _vg_path }}/btrfs",  opts: "{{ btrfs_options }},subvol=@var"     }
+      - { path: "{{ chroot }}/var/log", src: "{{ _vg_path }}/btrfs",  opts: "{{ btrfs_options }},subvol=@var_log" }
+      # - { path: "{{ chroot }}/var/cache/pacman/pkg", src: "{{ _vg_path }}/btrfs", opts: "{{ btrfs_options }},subvol=@var/cache/pacman/pkg" }
+      - { path: "{{ chroot }}/usr",       src: "{{ _vg_path }}/btrfs",  opts: "{{ btrfs_options }},subvol=@usr"     }
+      - { path: "{{ chroot }}/opt",       src: "{{ _vg_path }}/btrfs",  opts: "{{ btrfs_options }},subvol=@opt"     }
+      - { path: "{{ chroot }}/snapshots", src: "{{ _vg_path }}/btrfs",  opts: "{{ btrfs_options }},subvol=@snapshots" }
+      - { path: "{{ chroot }}/home",      src: "{{ _vg_path }}/btrfs",  opts: "{{ btrfs_options }},subvol=@home"    }
+        # notail,relatime,nodev,nosuid
+      - { path: "{{ chroot }}/boot",      src: "{{ _boot_partition }}", fs: vfat }
+        # /boot   vfat     noauto,relatime                     1 2
+      # none               /tmp       tmpfs    nodev,nosuid,noexec                 0 0
+
+  - name: shell > reload systemd daemon to source new fstab
+    shell:
+      cmd: systemctl daemon-reload
+
+  ## TOUJOURS UTILE ?
+  # - name: "[btrfs] [shell] list content of {{ chroot }}/home"
+  #   shell: ls -la {{ chroot }}/home
+  #   register: ls
+
+  # - name: "[btrfs] [file] delete files on {{ chroot }}/home"
+  #   file:
+  #     path: "{{ chroot }}/home/{{ item }} "
+  #     state: absent
+  #   with_items: "{{ ls.stdout_lines }}"
+
+  # - name: "[btrfs] [shell] list content of {{ chroot }}/boot"
+  #   shell: ls -la {{ chroot }}/boot
+  #   register: _ls
+
+  # - name: "[btrfs] [file] delete files on {{ chroot }}/boot"
+  #   file:
+  #     path:  "{{ chroot }}/boot/{{ item }} "
+  #     state: absent
+  #   with_items: "{{ _ls.stdout_lines }}"
+
+  when: btrfs_enable
+  tags: btrfs

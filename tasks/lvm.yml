@@ -1,0 +1,101 @@
+- block:
+  - name: lvm | lvg > create/remove LVM volume group.s
+    lvg:
+      vg:    "{{ item.vgname }}"
+      pvs:   "{{ item.disks | join(',') }}"
+      state: "{{ item.state | default('present') }}"
+    with_items:
+      - "{{ lvm }}"
+
+  - name: lvm | lvol > create/remove LVM logical volume.s
+    lvol:
+      vg:     "{{ item.0.vgname }}"
+      pvs:    "{{ item.0.disks | join(',') }}"
+      lv:     "{{ item.1.lvname }}"
+      size:   "{{ item.1.size   }}"
+      opts:   "{{ item.1.opts | default(omit) }}"
+      shrink: false
+      force:  true
+      state:  "{{ item.1.state | default('present') }}"
+    with_subelements:
+      - "{{ lvm }}"
+      - volumes
+      - skip_missing: true
+
+  when: lvm_enable
+  tags: lvm
+
+# - block:
+#   ## list all existing lvm group THEN remove them
+#   - name: lvm | lvg > remove older lvm groups
+#     lvg:
+#       vg:    "{{ item }}"
+#       force: yes
+#       state: absent
+#     with_items:
+#       - lvm
+#       - os
+#       - pool
+#       - pve
+
+#   # - name: "[parted] get {{ device }} information"
+#   #   parted:
+#   #     device: "{{ device }}"
+#   #     unit: MiB                 # always needed when probing
+#   #   register: device_info
+
+#   # ## ne fonctionne pas pour 2 SSD
+#   # - name: "[parted] remove all partitions from {{ device }}"
+#   #   parted:
+#   #     device: "{{ device }}"
+#   #     number: "{{ item.num }}"
+#   #     state: absent
+#   #   loop: "{{ device_info.partitions }}"
+
+#   - name: lvm | lvg > create lvm group on {{ 'luks container' if _luks else (disk.device + _nvme_p + _part_sys_num) }}
+#     lvg:
+#       vg:  "{{ disk.vg | default('lvm') }}"
+#       pvs: "{{ ('/dev/mapper/' + disk.luks.name | default('luks')) if _luks else ('/dev/' + disk.device + _nvme_p + _part_sys_num) }}"
+#       # v2 pvs: "/dev/mapper/{{ luks.name | default('luks') }}"
+#       # v1 pvs: "/dev/mapper/{{ luks.name }}1,/dev/mapper/{{ luks.name }}2"
+
+#   ## déplacer dans roles/filesystem
+#   # - name: "[file] mkdir {{ disk[this].chroot }}/{usr,var,home,boot}"
+#   #   file:
+#   #     path: "{{ disk[this].chroot }}/{{ item.path }}"
+#   #     state: "{{ item.state }}"
+#   #   with_items:
+#   #     # - { path: "{{ ls.stdout_lines }}", state: absent }  # delete files on {{ arch_root }}"          # j'ai supprimer par erreur la tasks avec register: ls
+#   #     - { path: usr,  state: directory }
+#   #     - { path: var,  state: directory }
+#   #     - { path: home, state: directory }
+#   #     - { path: boot, state: directory }
+
+#   - name: lvm | shell > get RAM size for SWAP size
+#     shell: grep -i memtotal /proc/meminfo | grep -o "[0-9]*"
+#     register: _ram_size
+
+#   # - name: "[lvol] create logical volume root,var,usr,swap,home"
+#   #   lvol:
+#   #     vg:   "{{ disk.vg | default('lvm') }}"
+#   #     lv:   "{{ item.volume }}"
+#   #     size: "{{ item.size }}"
+#   #     pvs:  "{{ ('/dev/mapper/' + disk.luks.name | default('luks')) if disk.luks.enable else (disk.device + _part_sys_num) }}"
+#   #   loop:
+#   #     - { volume: root,  size: "{{ _part_sys.root }}g"    , fs: ext4  }
+#   #     - { volume: var,   size: "{{ _part_sys.var }}g"     , fs: ext4  }
+#   #     - { volume: usr,   size: "{{ _part_sys.usr }}g"     , fs: ext4  }
+#   #     - { volume: swap,  size: "{{ (_part_sys.swap + 'g') if _part_sys.swap is defined else ((_ram_size.stdout | int) * 2 + 'k') }}", fs: "{{ disk.partition.system.fs }}" }      ## swap doit être = RAM x 2 et si possible split sur un maximum de disk pour augmenter les perfs
+#   #     - { volume: home,  size: "{{ _part_system.home }}%FREE", fs: ext4  }
+#   #   when: disk.partition.system.fs == "ext4"
+
+#   - name: lvm | lvol > create logical volume swap and btrfs
+#     lvol:
+#       vg:   "{{ disk.vg | default('lvm') }}"
+#       lv:   "{{ item.volume }}"
+#       size: "{{ item.size }}"
+#       pvs:  "{{ ('/dev/mapper/' + disk.luks.name | default('luks')) if _luks else ('/dev/' + disk.device + _nvme_p + _part_sys_num) }}"
+#     loop:
+#       - { volume: swap,  size: "{{ (_part_sys.swap + 'g') if _part_sys.swap is defined else (((_ram_size.stdout | int) * 2) | string + 'k') }}" }
+#       - { volume: btrfs, size: "100%FREE", fs: btrfs }
+#     when: disk.fs == "btrfs"

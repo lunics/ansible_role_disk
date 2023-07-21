@@ -1,0 +1,17 @@
+- block:
+  - name: gpt | parted > create/remove gpt partition.s
+    parted:
+      device:     "{{ item.0.device }}"
+      number:     "{{ item.1.number }}"
+      flags:      "{{ item.1.flags | default(omit)      }}"
+      part_start: "{{ item.1.start | default(omit)      }}"
+      part_end:   "{{ item.1.end   | default(omit)      }}"
+      part_type:  "{{ item.1.type  | default('primary') }}"
+      state:      "{{ item.1.state | default('present') }}"
+      label:      "{{ item.1.label | default('gpt')     }}"
+    with_subelements:
+      - "{{ gpt }}"
+      - partition
+      - skip_missing: true
+
+  tags: gpt

@@ -1,0 +1,17 @@
+- block:
+  - import_tasks: gpt.yml
+
+  - import_tasks: luks.yml
+
+  - import_tasks: lvm.yml
+
+  - import_tasks: mkfs.yml
+
+  - import_tasks: btrfs.yml
+
+  # - import_tasks: mount.yml
+
+  # - name: btrfs | shell > swapon swap partition
+  #   shell: swapon "{{ _vg_path }}"/swap
+
+  tags: disk
