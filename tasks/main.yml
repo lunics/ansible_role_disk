@@ -9,9 +9,6 @@
 
   - import_tasks: btrfs.yml
 
-  # - import_tasks: mount.yml
-
-  # - name: btrfs | shell > swapon swap partition
-  #   shell: swapon "{{ _vg_path }}"/swap
+  - import_tasks: mount.yml
 
   tags: disk

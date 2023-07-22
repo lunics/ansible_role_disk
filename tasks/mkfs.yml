@@ -4,7 +4,7 @@
       fstype: "{{ item.fstype }}"
       dev:    "{{ item.dev    }}"
       opts:   "{{ (('-n ' if item.fstype == 'vfat' else '-L ') + item.label + ' ')
-                  + (item.opts | default('')) }}"    # -n on vfat = -L on ext4/btrfs
+                  + (item.mkfs_opts | default('')) }}"    # -n on vfat = -L on ext4/btrfs
       force:  "{{ item.force | default('false')   }}"
       state:  "{{ item.state | default('present') }}"
     with_items:

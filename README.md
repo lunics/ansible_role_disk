@@ -63,6 +63,24 @@ btrfs:
   - @snapshots
   - @home
 ```
+result
+nvme0n1         259:0    0 238.5G  0 disk
+├─nvme0n1p1     259:2    0   299M  0 part
+└─nvme0n1p2     259:5    0 238.2G  0 part
+  └─luks        254:1    0 238.2G  0 crypt
+    ├─lvm-swap  254:2    0    16G  0 lvm   [SWAP]
+    └─lvm-btrfs 254:3    0 222.2G  0 lvm   /usr
+                                           /srv
+                                           /snapshots
+                                           /root
+                                           /tmp
+                                           /opt
+                                           /var/lib/libvirt
+                                           /var/cache/pacman
+                                           /var/cache
+                                           /var/log
+                                           /home
+                                           /
 
 TODO
 - change path chroot by another variable

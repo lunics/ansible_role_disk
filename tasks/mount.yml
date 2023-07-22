@@ -1,21 +1,19 @@
 - block:
-  - name: mount | set_fact > chroot path
-    set_fact:
-      t_chroot: "{{ path_chroot if ansible_play_name == 'bootstrap' else '' }}"
+  - name: shell > enable swap partition
+    shell: swapon {{ item.dev }}
+    when: item.fstype == "swap"
+    with_items: "{{ fs }}"
 
-  - name: mount | file > create root dir first
-    file:
-      path:  "{{ t_chroot }}/"
-      state: directory
-
+  # must mount ext4 on lvm or on primary partition, and boot partition
   - name: mount > partition.s, volume.s and subvolume.s
     mount:
-      src:    "{{ item.dev         }}"
-      path:   "{{ t_chroot + item.mount.point }}"
-      fstype: "{{ item.fstype      }}"
-      opts:   "{{ item.mount.opts  | default(omit)      }}"
-      state:  "{{ item.mount.state | default('mounted') }}"
+      src:    "{{ item.dev }}"
+      path:   "{{ chroot + item.path }}"
+      fstype: "{{ item.fstype }}"
+      opts:   "{{ item.mnt_opts  | default(omit)      }}"
+      state:  "{{ item.state     | default('mounted') }}"
+    when: item.fstype not in ["swap", "btrfs"]
     with_items:
       - "{{ fs }}"
 
-  tags: mount
+  tags: mountt
