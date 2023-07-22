@@ -1,7 +1,7 @@
 # Ansible role: DISK
 
 Manage disk partitions at every level:
-- gpt
+- primary partition
 - luks
 - lvm
 - btrfs
