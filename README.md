@@ -63,3 +63,6 @@ btrfs:
   - @snapshots
   - @home
 ```
+
+TODO
+- change path chroot by another variable
