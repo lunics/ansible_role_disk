@@ -1,1 +1,40 @@
-btrfs_options: "defaults,noatime,nodiratime,ssd,discard,compress=zstd:3,commit=120"
+btrfs_options: "ssd,discard,compress=zstd:3,commit=120"
+
+btrfs: []             # btrfs subvolumes
+  # - name: "@"
+  #   mnt_opts: relatime,errors=remount-ro
+  # - name: "@home"
+  #   mnt_opts: rw,relatime,nodev,nosuid
+  # # - name: @var    do not exclude the entire /var out of the root snapshot because /var/lib/pacman database should mirror the rolled back state of installed packages
+  # #   opts: rw,relatime,nodev,nosuid,noexec  # programs like mail will not work with noexec and nosuid
+  # - name: "@logs"
+  #   path: /var/log
+  #   cow:  false       # disable Copy-On-Write
+  #   mnt_opts: rw,relatime,nodev,nosuid,noexec
+  # - name: "@cache"
+  #   path: /var/cache/
+  #   cow:  false
+  #   mnt_opts: rw,relatime,nodev,nosuid,noexec
+  # - name: "@packages"
+  #   path: /var/cache/pacman
+  #   cow:  false
+  #   mnt_opts: rw,relatime,nodev,nosuid,noexec
+  # - name: "@libvirt"
+  #   path: /var/lib/libvirt
+  #   cow:  false
+  #   mnt_opts: rw,relatime,nodev,nosuid,noexec
+  # # - name: "@var_tmp"
+  # #   path: /var/tmp
+  # #   opts: noatime,nodiratime,nodev,nosuid
+  # #   cow:  false
+  # - name: "@opt"
+  # ## if /tmp on a separate partition: chmod 1777 /mnt/tmp
+  # ## if /var/tmp on a separate partition: chmod 1777 /mnt/var/tmp
+  # ## /tmp or /var/tmp ?
+  # - name: "@tmp"
+  #   mnt_opts: rw,nodev,nosuid,noexec    # noexec can block some legitimate scripts
+  # - name: "@root"
+  # - name: "@snapshots"
+  # - name: "@srv"
+  # - name: "@usr"
+  #   mnt_opts: ro,noatime,nodev   # /usr is remounted in rw mode only when system update then returned to read-only

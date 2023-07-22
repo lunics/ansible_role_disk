@@ -10,8 +10,10 @@
       src:    "{{ item.dev }}"
       path:   "{{ chroot + item.path }}"
       fstype: "{{ item.fstype }}"
-      opts:   "{{ item.mnt_opts  | default(omit)      }}"
-      state:  "{{ item.state     | default('mounted') }}"
+      opts:   "{{ item.mnt_opts | default(omit)      }}"
+      state:  "{{ item.state    | default('mounted') }}"
+      dump:   "{{ item.dump     | default(0) }}"
+      passno: "{{ item.passno   | default(0) }}"
     when: item.fstype not in ["swap", "btrfs"]
     with_items:
       - "{{ fs }}"

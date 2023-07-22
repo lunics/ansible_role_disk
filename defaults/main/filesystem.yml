@@ -1,18 +1,22 @@
 fs: []
+  # - fstype:   vfat            # ESP (UEFI System Partition) must be in FAT variant vfat/FAT32
+  #   dev:      /dev/nvme0n1p1
+  #   force:    true
+  #   label:    boot
+  #   path:     /boot
+  #   mnt_opts: noauto,relatime
+  #   dump:     1
+  #   passno:   2
+  # - fstype:   swap
+  #   dev:      /dev/lvm/swap
+  #   label:    swap
+  # - fstype:   btrfs
+  #   dev:      /dev/lvm/btrfs
+  #   mkfs_opts: --nodiscard --checksum xxhash
+  #   label:    btrfs
+  #   path:     /
+  # # or
   # - fstype: ext4
   #   dev:    /dev/lvm/root
   #   label:  root
-  #   mount:
-  #     point: /
-  # # - fstype: btrfs
-  # #   dev:    /dev/lvm/btrfs
-  # #   label:  root
-  # #   mount:
-  # #     point: /
-  # - fstype: vfat
-  #   dev:    /dev/vda1
-  #   force:  true
-  #   mount:
-  #     point: /boot
-  # # - fstype: swap
-  # #   dev:    /dev/vda3         # doit être placée en 3ème postition
+  #   path:   /

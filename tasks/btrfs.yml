@@ -51,9 +51,7 @@
                      else ('/' + (item.1.name | regex_replace('^@', '')))) }}"
       src:    "{{ item.0.dev }}"
       fstype: btrfs
-      opts:   "{{ ((item.1.mnt_opts + ',') if item.1.mnt_opts is defined else '') + btrfs_options }},subvol={{ item.1.name }}"
-      dump:   0 # already managed by BTRFS
-      passno: 0 # already managed by BTRFS
+      opts:   "{{ ((item.1.mnt_opts + ',') if item.1.mnt_opts is defined else 'defaults,noatime,nodiratime,') + btrfs_options }},subvol={{ item.1.name }}"
       state:  mounted
     when:
       - item.0.fstype == "btrfs"
@@ -70,8 +68,6 @@
       src:    "{{ item.0.dev }}"
       fstype: btrfs
       opts:   "{{ ((item.1.mnt_opts + ',') if item.1.mnt_opts is defined else '') + btrfs_options }},subvol={{ item.1.name }}"
-      dump:   0 # already managed by BTRFS
-      passno: 0 # already managed by BTRFS
       state:  mounted
     when:
       - item.0.fstype == "btrfs"
