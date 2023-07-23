@@ -18,4 +18,4 @@
     with_items:
       - "{{ fs }}"
 
-  tags: mountt
+  tags: mount

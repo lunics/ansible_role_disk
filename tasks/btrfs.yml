@@ -93,5 +93,13 @@
       - item.cow is false
     with_items: "{{ btrfs }}"
 
+  - name: file > change /tmp permissions
+    file:
+      path: "{{ chroot + (item.path if item.path is defined
+                    else ('/' + (item.name | regex_replace('^@', '')))) }}"
+      mode: 1777
+    when: item.name in ["@tmp","@var_tmp"]
+    with_items: "{{ btrfs }}"
+
   when: btrfs_enable
   tags: btrfs

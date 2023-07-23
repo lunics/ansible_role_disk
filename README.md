@@ -9,7 +9,7 @@ Manage disk partitions at every level:
 Only tested on Archlinux.
 
 ## Usage
-See [defaults](https://github.com/lunics/ansible_role_disk/tree/main/defaults/main)
+Override [defaults](https://github.com/lunics/ansible_role_disk/tree/main/defaults/main)
 ```yaml
 gpt:
   - device: /dev/nvme0n1
@@ -21,12 +21,14 @@ gpt:
      - number: 2
        start:  300MiB
        end:    100%
-
+```
+```yaml
 luks:
   - partition: /dev/nvme0n1p2
     name:      luks
     password:  "{{ vault.luks }}"
-
+```
+```yaml
 lvm:
   - vgname: lvm
     disks:
@@ -36,7 +38,8 @@ lvm:
         size:       16g
       - lvname:     btrfs
         size:       100%FREE
-
+```
+```yaml
 fs:
   - fstype:   vfat            # ESP (UEFI System Partition) must be in FAT variant vfat/FAT32
     dev:      /dev/nvme0n1p1
@@ -54,7 +57,8 @@ fs:
     mkfs_opts: --nodiscard --checksum xxhash
     label:    btrfs
     path:     /
-
+```
+```yaml
 btrfs:                # btrfs subvolumes
   - name: "@"
     mnt_opts: relatime,errors=remount-ro
@@ -92,7 +96,7 @@ btrfs:                # btrfs subvolumes
 Result:
 ```
 nvme0n1         259:0    0 238.5G  0 disk
-├─nvme0n1p1     259:2    0   299M  0 part
+├─nvme0n1p1     259:2    0   299M  0 part  /boot
 └─nvme0n1p2     259:5    0 238.2G  0 part
   └─luks        254:1    0 238.2G  0 crypt
     ├─lvm-swap  254:2    0    16G  0 lvm   [SWAP]
@@ -109,6 +113,5 @@ nvme0n1         259:0    0 238.5G  0 disk
                                            /home
                                            /
 ```
-
 TODO
 - change path chroot by another variable
