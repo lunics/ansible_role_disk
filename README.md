@@ -91,7 +91,7 @@ btrfs:                # btrfs subvolumes
   - name: "@snapshots"
   - name: "@srv"
   - name: "@usr"
-    mnt_opts: ro,noatime,nodev
+    mnt_opts: rw,noatime,nodev
 ```
 Result:
 ```
