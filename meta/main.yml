@@ -12,6 +12,7 @@ galaxy_info:
   galaxy_tags:
     - parted
     - luks
+    - ext4
     - lvm
     - btrfs
 

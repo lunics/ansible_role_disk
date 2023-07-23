@@ -46,7 +46,6 @@ fs:
     force:    true
     label:    boot
     path:     /boot
-    mnt_opts: noauto,relatime
     dump:     1
     passno:   2
   - fstype:   swap

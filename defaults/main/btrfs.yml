@@ -28,13 +28,10 @@ btrfs: []             # btrfs subvolumes
   # #   opts: noatime,nodiratime,nodev,nosuid
   # #   cow:  false
   # - name: "@opt"
-  # ## if /tmp on a separate partition: chmod 1777 /mnt/tmp
-  # ## if /var/tmp on a separate partition: chmod 1777 /mnt/var/tmp
-  # ## /tmp or /var/tmp ?
-  # - name: "@tmp"
+  # - name: "@tmp"                        ## /tmp or /var/tmp ?
   #   mnt_opts: rw,nodev,nosuid,noexec    # noexec can block some legitimate scripts
   # - name: "@root"
   # - name: "@snapshots"
   # - name: "@srv"
   # - name: "@usr"
-  #   mnt_opts: ro,noatime,nodev   # /usr is remounted in rw mode only when system update then returned to read-only
+  #   mnt_opts: rw,noatime,nodev
