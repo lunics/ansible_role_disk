@@ -1,8 +1,9 @@
 btrfs_options: "ssd,discard,compress=zstd:3,commit=120"
 
+## rw/ro permissions per subvolume are not yet implemented in btrfs
 btrfs: []             # btrfs subvolumes
   # - name: "@"
-  #   mnt_opts: relatime,errors=remount-ro
+  #   mnt_opts: relatime
   # - name: "@home"
   #   mnt_opts: rw,relatime,nodev,nosuid
   # # - name: @var    do not exclude the entire /var out of the root snapshot because /var/lib/pacman database should mirror the rolled back state of installed packages
