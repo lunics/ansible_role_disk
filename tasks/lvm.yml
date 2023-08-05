@@ -2,7 +2,7 @@
   - name: lvm | lvg > create/remove LVM volume group.s
     lvg:
       vg:    "{{ item.vgname }}"
-      pvs:   "{{ item.disks | join(',') }}"
+      pvs:   "{{ item.pv    | join(',') }}"
       state: "{{ item.state | default('present') }}"
     with_items:
       - "{{ lvm }}"
@@ -10,17 +10,20 @@
   - name: lvm | lvol > create/remove LVM logical volume.s
     lvol:
       vg:     "{{ item.0.vgname }}"
-      pvs:    "{{ item.0.disks | join(',') }}"
-      lv:     "{{ item.1.lvname }}"
-      size:   "{{ item.1.size   }}"
+      pvs:    "{{ item.0.pv  | join(',') }}"
+      lv:     "{{ item.1.name }}"
+      size:   "{{ item.1.size }}"
       opts:   "{{ item.1.opts | default(omit) }}"
       shrink: false
       force:  true
       state:  "{{ item.1.state | default('present') }}"
     with_subelements:
       - "{{ lvm }}"
-      - volumes
+      - lv
       - skip_missing: true
+
+  ## fill the logical volume btrfs with a stream of zeros
+  ## dd if=/dev/zero of=/dev/lvm/btrfs bs=1M status=progress oflag=direct
 
   when: lvm_enable
   tags: lvm

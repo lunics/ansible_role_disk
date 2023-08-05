@@ -1,9 +1,9 @@
 galaxy_info:
   role_name:    disk
   author:       lunics
+  company:      none
   description:  A role to manage disk partitions
   license:      GPL-3.0
-  company:      none
   min_ansible_version: 2.1
   platforms:
     - name: Archlinux
@@ -15,5 +15,7 @@ galaxy_info:
     - ext4
     - lvm
     - btrfs
+    - filesystem
+    - mount
 
 dependencies: []

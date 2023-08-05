@@ -6,7 +6,8 @@ swap_enable:  false
 
 default_luks_name: luks
 default_vg_name:   lvm
-default_swapiness: 10
 
 target_chroot: true      # true = on the mounted chroot /mnt of the target; false = on the target system directly
 chroot: /mnt
+
+swapiness: 10       ## move to another role ?

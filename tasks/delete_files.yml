@@ -1,0 +1,44 @@
+- block:
+  # v1
+  # - name: list content of {{ chroot }}
+  #   shell: ls -la {{ chroot }}
+  #   register: r_ls
+  # - name: delete files on {{ chroot }}
+  #   file:
+  #     path: "{{ chroot + '/' + item }} "
+  #     state:   absent
+  #   with_items: "{{ r_ls.stdout_lines }}"
+  # - debug:
+  #     var: r_ls.stdout_lines
+
+  # v2
+  # - name: Find files
+  #   find:
+  #     paths: "{{ chroot }}"
+  #     file_type: any
+  #   register: r_file_list
+  # ## fake positive
+  # - name: delete files on {{ chroot }}
+  #   file:
+  #     path: "{{ chroot + '/' + item }} "
+  #     state:   absent
+  #   loop: "{{ r_file_list.files | map(attribute='path') | map('basename') | list }}"
+  #   # with_items: "{{ r_ls.stdout_lines }}"
+
+  # v3
+  - name: shell > remove previous disk content
+    shell:
+      cmd: rm -r {{ chroot }}/*
+    ignore_errors: true
+
+  # - name: "[btrfs] [shell] list content of {{ chroot }}/boot"
+  #   shell: ls -la {{ chroot }}/boot
+  #   register: _ls
+
+  # - name: "[btrfs] [file] delete files on {{ chroot }}/boot"
+  #   file:
+  #     path:  "{{ chroot }}/boot/{{ item }} "
+  #     state: absent
+  #   with_items: "{{ _ls.stdout_lines }}"
+
+  tags: delete_files

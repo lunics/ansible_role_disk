@@ -12,11 +12,11 @@
 
   - name: luks | luks_device > create then open new luks container
     luks_device:
-      device:     "{{ item.partition }}"
+      device:     "{{ item.device }}"
       name:       "{{ item.name   | default(default_luks_name) }}"
       passphrase: "{{ item.password }}"
       cipher:     "{{ item.cipher | default('aes-xts-plain64') }}"
-      type:       "{{ item.type   | default('luks2') }}"
+      type:       "{{ item.type   | default('luks2')  }}"
       hash:       "{{ item.hash   | default('sha512') }}"
       label:      "{{ item.label  | default('luks') }}"
       pbkdf:

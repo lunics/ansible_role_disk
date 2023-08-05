@@ -79,10 +79,10 @@ btrfs:                # btrfs subvolumes
     path: /var/lib/libvirt
     cow:  false
     mnt_opts: rw,relatime,nodev,nosuid,noexec
-  # - name: "@var_tmp"
-  #   path: /var/tmp
-  #   opts: noatime,nodiratime,nodev,nosuid
-  #   cow:  false
+  - name: "@var_tmp"
+    path: /var/tmp
+    opts: noatime,nodiratime,nodev,nosuid
+    cow:  false
   - name: "@opt"
   - name: "@tmp"
     mnt_opts: rw,nodev,nosuid,noexec

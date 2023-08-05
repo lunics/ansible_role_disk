@@ -1,5 +1,5 @@
 fs: []
-  # - fstype:   vfat            # ESP (UEFI System Partition) must be in FAT variant vfat/FAT32
+  # - fstype:   vfat
   #   dev:      /dev/nvme0n1p1
   #   force:    true
   #   label:    boot

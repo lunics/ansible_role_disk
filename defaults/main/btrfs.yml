@@ -1,4 +1,4 @@
-btrfs_options: "ssd,discard,compress=zstd:3,commit=120"
+btrfs_options: "ssd,discard=async,space_cache=v2,compress-force=zstd:3,commit=120"
 
 ## rw/ro permissions per subvolume are not yet implemented in btrfs
 btrfs: []             # btrfs subvolumes
@@ -6,8 +6,7 @@ btrfs: []             # btrfs subvolumes
   #   mnt_opts: relatime
   # - name: "@home"
   #   mnt_opts: rw,relatime,nodev,nosuid
-  # # - name: @var    do not exclude the entire /var out of the root snapshot because /var/lib/pacman database should mirror the rolled back state of installed packages
-  # #   opts: rw,relatime,nodev,nosuid,noexec  # programs like mail will not work with noexec and nosuid
+  ## - name: @var    do not separate /var out of the root snapshot because /var/lib/pacman database should mirror the rolled back state of installed packages
   # - name: "@logs"
   #   path: /var/log
   #   cow:  false       # disable Copy-On-Write
@@ -24,12 +23,12 @@ btrfs: []             # btrfs subvolumes
   #   path: /var/lib/libvirt
   #   cow:  false
   #   mnt_opts: rw,relatime,nodev,nosuid,noexec
-  # # - name: "@var_tmp"
-  # #   path: /var/tmp
-  # #   opts: noatime,nodiratime,nodev,nosuid
-  # #   cow:  false
+  # - name: "@var_tmp"
+  #   path: /var/tmp
+  #   opts: noatime,nodiratime,nodev,nosuid,noexec
+  #   cow:  false
   # - name: "@opt"
-  # - name: "@tmp"                        ## /tmp or /var/tmp ?
+  # - name: "@tmp"
   #   mnt_opts: rw,nodev,nosuid,noexec    # noexec can block some legitimate scripts
   # - name: "@root"
   # - name: "@snapshots"

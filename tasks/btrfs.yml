@@ -12,6 +12,11 @@
       - item.path == "/"
       - item.fstype == "btrfs"
 
+  - import_tasks: delete_files.yml
+
+  # - pause:
+  #     prompt: Press [enter] to continue
+
   - name: btrfs | btrfs_subvolumes create btrfs subvolumes
     btrfs_subvolume:
       path:  "{{ chroot + '/' + item.name }}"
@@ -52,11 +57,11 @@
       src:    "{{ item.0.dev }}"
       fstype: btrfs
       opts:   "{{ ((item.1.mnt_opts + ',') if item.1.mnt_opts is defined else 'defaults,noatime,nodiratime,') + btrfs_options }},subvol={{ item.1.name }}"
-      state:  mounted
+      state:  "{{ item.1.mnt_state | default('mounted') }}"
     when:
       - item.0.fstype == "btrfs"
       - item.0.path   == "/"
-      - item.1.name   not in ["@", "@packages"]
+      - item.1.lvl is not defined or item.1.lvl == 1
     with_nested:
       - "{{ fs }}"
       - "{{ btrfs }}"
@@ -68,11 +73,11 @@
       src:    "{{ item.0.dev }}"
       fstype: btrfs
       opts:   "{{ ((item.1.mnt_opts + ',') if item.1.mnt_opts is defined else 'defaults,noatime,nodiratime,') + btrfs_options }},subvol={{ item.1.name }}"
-      state:  mounted
+      state:  "{{ item.1.mnt_state | default('mounted') }}"
     when:
       - item.0.fstype == "btrfs"
       - item.0.path   == "/"
-      - item.1.name   in ["@packages"]
+      - item.1.lvl is defined and item.1.lvl == 2
     with_nested:
       - "{{ fs }}"
       - "{{ btrfs }}"
