@@ -1,11 +1,5 @@
 - block:
-  - name: shell > enable swap partition
-    shell: swapon {{ item.dev }}
-    when: item.fstype == "swap"
-    with_items: "{{ fs }}"
-
-  # must mount ext4 on lvm or on primary partition, and boot partition
-  - name: mount > partition.s, volume.s and subvolume.s
+  - name: mount > partition.s, volume.s lvl 1
     mount:
       src:    "{{ item.dev }}"
       path:   "{{ chroot + item.path }}"
@@ -13,8 +7,34 @@
       opts:   "{{ item.mnt_opts | default(omit)      }}"
       state:  "{{ item.state    | default('mounted') }}"
       dump:   "{{ item.dump     | default(0) }}"
-      passno: "{{ item.passno   | default(0) }}"
-    when: item.fstype not in ["swap", "btrfs"]
+      passno: "{{ item.pass     | default(0) }}"
+    when:
+      - item.fstype not in ["swap", "btrfs"]
+      - item.lvl is not defined or item.lvl == 1
+    with_items:
+      - "{{ fs }}"
+
+  - name: file > create mount point lvl 2
+    file:
+      path:  "{{ item.path }}"
+      state: directory
+    when:
+      - item.lvl is defined and item.lvl == 2
+    with_items:
+      - "{{ fs }}"
+
+  - name: mount > partition.s, volume.s lvl 2
+    mount:
+      src:    "{{ item.dev }}"
+      path:   "{{ chroot + item.path }}"
+      fstype: "{{ item.fstype }}"
+      opts:   "{{ item.mnt_opts | default(omit)      }}"
+      state:  "{{ item.state    | default('mounted') }}"
+      dump:   "{{ item.dump     | default(0) }}"
+      passno: "{{ item.pass     | default(0) }}"
+    when:
+      - item.fstype not in ["swap", "btrfs"]
+      - item.lvl is defined and item.lvl == 2
     with_items:
       - "{{ fs }}"
 

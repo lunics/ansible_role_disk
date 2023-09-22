@@ -2,7 +2,7 @@ galaxy_info:
   role_name:    disk
   author:       lunics
   company:      none
-  description:  A role to manage disk partitions
+  description:  A role to manage disk partitions.
   license:      GPL-3.0
   min_ansible_version: 2.1
   platforms:

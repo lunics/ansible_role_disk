@@ -6,3 +6,5 @@ lvm: []
   #   volumes:
   #     - lvname:     root
   #       size:       100%FREE
+
+lvm_pool: false

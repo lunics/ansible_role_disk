@@ -1,0 +1,88 @@
+- block:
+  # v1
+  # - name: list content of {{ chroot }}
+  #   shell: ls -la {{ chroot }}
+  #   register: r_ls
+  # - name: delete files on {{ chroot }}
+  #   file:
+  #     path: "{{ chroot + '/' + item }} "
+  #     state:   absent
+  #   with_items: "{{ r_ls.stdout_lines }}"
+  # - debug:
+  #     var: r_ls.stdout_lines
+
+  # v2
+  # - name: Find files
+  #   find:
+  #     paths: "{{ chroot }}"
+  #     file_type: any
+  #   register: r_file_list
+  # ## fake positive
+  # - name: delete files on {{ chroot }}
+  #   file:
+  #     path: "{{ chroot + '/' + item }} "
+  #     state:   absent
+  #   loop: "{{ r_file_list.files | map(attribute='path') | map('basename') | list }}"
+  #   # with_items: "{{ r_ls.stdout_lines }}"
+
+  # v3
+  # - name: shell > remove previous disk content
+  #   shell:
+  #     cmd: rm -r {{ chroot }}/*
+  #   ignore_errors: true
+
+  # - name: "[btrfs] [shell] list content of {{ chroot }}/boot"
+  #   shell: ls -la {{ chroot }}/boot
+  #   register: _ls
+
+  # - name: "[btrfs] [file] delete files on {{ chroot }}/boot"
+  #   file:
+  #     path:  "{{ chroot }}/boot/{{ item }} "
+  #     state: absent
+  #   with_items: "{{ _ls.stdout_lines }}"
+
+  # v4
+  # - name: parted > check luks partitions present
+  #   parted:
+  #     device: "{{ gpt.0.device }}"
+  #     state:  info
+  #   register: r_luks
+  # - debug:
+  #     var: r_luks
+  - name: erase_disk | luks_device > close luks partition
+    luks_device:
+      device: "{{ item.device }}"
+      state:  closed
+    loop: "{{ luks }}"
+    when:
+      - luks_enable
+      # - r_luks.device.3
+
+  - name: parted > remove all previous partitions
+    parted:
+      device: "{{ gpt.0.device }}"
+      number: "{{ item }}"
+      state: absent
+    loop:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+
+  - name: erase_disk | parted > override previous "{{ gpt.0.device }}" fs to avoid luks errors
+    filesystem:
+      fstype: vfat
+      dev:    "{{ gpt.0.device }}"
+      force:  yes
+
+  - name: erase_disk | shell > erase filesystems, partition tables, GPT and MBR data structures
+    shell:
+      cmd: |
+        wipefs -af {{ gpt.0.device }}               # force erasing all filesystem or partition-table signatures
+        sgdisk --zap-all --clear {{ gpt.0.device }} # zap-all = destroy the GPT and MBR data structures, clear = clear out GPT header data, all partition definitions, protective  MBR
+        partprobe {{ gpt.0.device }}                # inform the OS of partition table changes
+
+  when: erase_disk
+  tags: erase_disk

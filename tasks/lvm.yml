@@ -1,13 +1,20 @@
 - block:
-  - name: lvm | lvg > create/remove LVM volume group.s
+  - name: package > intall dependencies
+    package:
+      name: "{{ item }}"
+    with_items:
+      - lvm2
+
+  - name: lvm | lvg > create/remove volume group.s
     lvg:
       vg:    "{{ item.vgname }}"
       pvs:   "{{ item.pv    | join(',') }}"
       state: "{{ item.state | default('present') }}"
+      force: "{{ true if (item.state is defined and item.state == 'absent') else false }}"
     with_items:
       - "{{ lvm }}"
 
-  - name: lvm | lvol > create/remove LVM logical volume.s
+  - name: lvm | lvol > create/remove logical volume.s
     lvol:
       vg:     "{{ item.0.vgname }}"
       pvs:    "{{ item.0.pv  | join(',') }}"
@@ -15,15 +22,42 @@
       size:   "{{ item.1.size }}"
       opts:   "{{ item.1.opts | default(omit) }}"
       shrink: false
-      force:  true
+      force:  "{{ true if (item.state is defined and item.state == 'absent') else false }}"
       state:  "{{ item.1.state | default('present') }}"
+    when: item.0.state is not defined or item.0.state == "present"
     with_subelements:
       - "{{ lvm }}"
       - lv
       - skip_missing: true
 
+  # A DELETE
+  # - name: lvm | lvol > create RAM partition
+  #   lvol:
+  #     vg:     "{{ lvm.0.vgname }}"
+  #     # pvs:    "{{ lvm.0.pv.0 }}"
+  #     lv:     "{{ item.1.name }}"
+  #     size:   "{{ item.1.size }}"
+  #     opts:   "{{ item.1.opts | default(omit) }}"
+  #     shrink: false
+  #     force:  "{{ true if (item.state is defined and item.state == 'absent') else false }}"
+  #     state:  "{{ item.1.state | default('present') }}"
+  #   when: item.0.state is not defined or item.0.state == "present"
+
   ## fill the logical volume btrfs with a stream of zeros
   ## dd if=/dev/zero of=/dev/lvm/btrfs bs=1M status=progress oflag=direct
+
+  - name: shell > convert data logical volume as thin-pool
+    shell: >
+      lvs lvm/pool | grep -I twi-a-tz ||
+      lvconvert -y --type thin-pool lvm/pool
+    when: lvm_pool
+
+  # IF lvm_cache_enabled = true
+  # create cache only if lvm/data is on a slower device than the cache
+  # - name: shell > convert lvm cache_metadata volume as cache_metadata thinpool
+  #   shell: lvconvert -y --type cache-pool --poolmetadata lvm/cache_metadata lvm/cache_data
+  # - name: shell > convert lvm cache_data volume as cache_data thinpool
+  #   shell: lvconvert -y --type cache --cachepool lvm/cache_data lvm/data
 
   when: lvm_enable
   tags: lvm

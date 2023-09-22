@@ -7,6 +7,7 @@
                   + (item.mkfs_opts | default('')) }}"    # -n on vfat = -L on ext4/btrfs
       force:  "{{ item.force | default('false')   }}"
       state:  "{{ item.state | default('present') }}"
+    when: item.fstype not in ["tmpfs"]
     with_items:
       - "{{ fs }}"
 

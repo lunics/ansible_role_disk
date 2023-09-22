@@ -1,4 +1,6 @@
 - block:
+  - import_tasks: erase_disk.yml
+
   - import_tasks: gpt.yml
 
   - import_tasks: luks.yml
@@ -10,5 +12,7 @@
   - import_tasks: btrfs.yml
 
   - import_tasks: mount.yml
+
+  # - import_tasks: swap.yml    # KO
 
   tags: disk

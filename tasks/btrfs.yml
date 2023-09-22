@@ -12,12 +12,20 @@
       - item.path == "/"
       - item.fstype == "btrfs"
 
-  - import_tasks: delete_files.yml
+  - name: shell > remove previous disk content
+    shell:
+      cmd: rm -fr {{ chroot }}/*
+    ignore_errors: true
 
-  # - pause:
-  #     prompt: Press [enter] to continue
+  - name: btrfs | btrfs_subvolume > remove all snapshots
+    btrfs_subvolume:
+      name:      "{{ chroot }}/@snapshots"
+      recursive: true
+      # snapshot_source: /@
+      # device:          /dev/vda2
+      state: absent
 
-  - name: btrfs | btrfs_subvolumes create btrfs subvolumes
+  - name: btrfs | btrfs_subvolume create btrfs subvolumes
     btrfs_subvolume:
       path:  "{{ chroot + '/' + item.name }}"
       state: present

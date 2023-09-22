@@ -1,11 +1,4 @@
 - block:
-  # - name: parted > override previous "{{ disk.device + _nvme_p + _part_sys_num }}" fs to avoid luks errors
-  #   filesystem:
-  #     fstype: vfat
-  #     dev:    "{{ disk.device + _nvme_p + _part_sys_num }}"
-  #     force:  yes
-
-  ## A TESTER
   - name: luks | modprobe > load xts kernel module
     modprobe:
       name: xts
@@ -16,9 +9,9 @@
       name:       "{{ item.name   | default(default_luks_name) }}"
       passphrase: "{{ item.password }}"
       cipher:     "{{ item.cipher | default('aes-xts-plain64') }}"
-      type:       "{{ item.type   | default('luks2')  }}"
+      type:       "{{ item.type   | default('luks1')  }}"     ## change for luks2 when grub2 will fully implement it
       hash:       "{{ item.hash   | default('sha512') }}"
-      label:      "{{ item.label  | default('luks') }}"
+      # label:      "{{ item.label  | default('luks') }}"     ## only available with luks2
       pbkdf:
         iteration_time: 5
       # keyfile:    "{{ item.keyfile | default(omit) }}"
