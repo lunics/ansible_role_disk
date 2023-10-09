@@ -49,14 +49,26 @@
   #   register: r_luks
   # - debug:
   #     var: r_luks
+
+  # - name: mount > umount all points
+  #   mount:
+  #     src:
+  #     path:
+  #     state: absent
+  #   loop: "{{ gpt }}"
+
+  ## remove LVM volumes
+
+  # KO if disk without partitions
   - name: erase_disk | luks_device > close luks partition
     luks_device:
       device: "{{ item.device }}"
       state:  closed
+    register: r_close_luks
     loop: "{{ luks }}"
-    when:
-      - luks_enable
-      # - r_luks.device.3
+    when: luks_enable
+    failed_when: false
+    # failed_when: not (r_close_luks.msg | regex_search("No such file or directory"))   ## KO
 
   - name: parted > remove all previous partitions
     parted:

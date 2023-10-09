@@ -4,10 +4,10 @@
       src:    "{{ item.dev }}"
       path:   "{{ chroot + item.path }}"
       fstype: "{{ item.fstype }}"
-      opts:   "{{ item.mnt_opts | default(omit)      }}"
-      state:  "{{ item.state    | default('mounted') }}"
-      dump:   "{{ item.dump     | default(0) }}"
-      passno: "{{ item.pass     | default(0) }}"
+      opts:   "{{ item.mnt_opts  | default(omit)      }}"
+      state:  "{{ item.mnt_state | default('mounted') }}"
+      dump:   "{{ item.dump      | default(0) }}"
+      passno: "{{ item.pass      | default(0) }}"
     when:
       - item.fstype not in ["swap", "btrfs"]
       - item.lvl is not defined or item.lvl == 1
@@ -28,10 +28,10 @@
       src:    "{{ item.dev }}"
       path:   "{{ chroot + item.path }}"
       fstype: "{{ item.fstype }}"
-      opts:   "{{ item.mnt_opts | default(omit)      }}"
-      state:  "{{ item.state    | default('mounted') }}"
-      dump:   "{{ item.dump     | default(0) }}"
-      passno: "{{ item.pass     | default(0) }}"
+      opts:   "{{ item.mnt_opts  | default(omit)      }}"
+      state:  "{{ item.mnt_state | default('mounted') }}"
+      dump:   "{{ item.dump      | default(0) }}"
+      passno: "{{ item.pass      | default(0) }}"
     when:
       - item.fstype not in ["swap", "btrfs"]
       - item.lvl is defined and item.lvl == 2

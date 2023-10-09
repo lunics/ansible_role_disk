@@ -8,6 +8,8 @@ Manage disk partitions at every level:
 
 Only tested on Archlinux.
 
+erase_disk.yml is not fully ok.
+
 ## Usage
 Override [defaults](https://github.com/lunics/ansible_role_disk/tree/main/defaults/main)
 ```yaml

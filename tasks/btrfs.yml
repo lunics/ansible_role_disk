@@ -19,11 +19,11 @@
 
   - name: btrfs | btrfs_subvolume > remove all snapshots
     btrfs_subvolume:
-      name:      "{{ chroot }}/@snapshots"
+      path:      "{{ chroot }}/@snapshots"
       recursive: true
+      state: absent
       # snapshot_source: /@
       # device:          /dev/vda2
-      state: absent
 
   - name: btrfs | btrfs_subvolume create btrfs subvolumes
     btrfs_subvolume:
