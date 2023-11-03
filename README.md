@@ -8,7 +8,9 @@ Manage disk partitions at every level:
 
 Only tested on Archlinux.
 
-erase_disk.yml is not fully ok.
+Works by default for live systems with chroot=/mnt, set chroot: "" if you want to run the role on the real system.
+
+erase_disk.yml is not supported yet.
 
 ## Usage
 Override [defaults](https://github.com/lunics/ansible_role_disk/tree/main/defaults/main)
