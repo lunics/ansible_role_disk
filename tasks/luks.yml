@@ -11,7 +11,7 @@
       cipher:     "{{ item.cipher | default('aes-xts-plain64') }}"
       type:       "{{ item.type   | default('luks1')  }}"     ## change for luks2 when grub2 will fully implement it
       hash:       "{{ item.hash   | default('sha512') }}"
-      # label:      "{{ item.label  | default('luks') }}"     ## only available with luks2
+      label:      "{{ (item.label | default('luks')) if item.type == 'luks2' else omit }}"    # only available with luks2
       pbkdf:
         iteration_time: 5
       # keyfile:    "{{ item.keyfile | default(omit) }}"
